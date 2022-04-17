@@ -16,6 +16,7 @@ class ReplayNavigatorPlugin: public BakkesMod::Plugin::BakkesModPlugin/*, public
 	//Boilerplate
 	virtual void onLoad();
 	virtual void onUnload();
+	void ballOnTop();
 
 	// Inherited via PluginSettingsWindow
 	/*

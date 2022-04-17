@@ -2,13 +2,20 @@
 #include "ReplayNavigatorPlugin.h"
 
 
-BAKKESMOD_PLUGIN(ReplayNavigatorPlugin, "This plugin will let you skip through replays more easily", plugin_version, PLUGINTYPE_FREEPLAY)
+BAKKESMOD_PLUGIN(ReplayNavigatorPlugin, "Replay Navigator", plugin_version, PLUGINTYPE_FREEPLAY)
 
 std::shared_ptr<CVarManagerWrapper> _globalCvarManager;
 
 void ReplayNavigatorPlugin::onLoad()
 {
 	_globalCvarManager = cvarManager;
+
+	LOG("Hello I'm Jona's Plugin :)");
+
+	cvarManager->registerNotifier("BetterBallOnTop", [this](std::vector<std::string> args) {
+		ballOnTop();
+		}, "", PERMISSION_ALL);
+
 	//cvarManager->log("Plugin loaded!");
 
 	//cvarManager->registerNotifier("my_aweseome_notifier", [&](std::vector<std::string> args) {
@@ -45,4 +52,26 @@ void ReplayNavigatorPlugin::onLoad()
 
 void ReplayNavigatorPlugin::onUnload()
 {
+	LOG("Hello I'm unloaded now :(");
+}
+
+void ReplayNavigatorPlugin::ballOnTop()
+{
+	if (!gameWrapper->IsInFreeplay()) { return; }
+	
+	ServerWrapper server = gameWrapper->GetCurrentGameState();
+	if (!server) { return; }
+
+	BallWrapper ball = server.GetBall();
+	if (!ball) { return; }
+
+	CarWrapper car = gameWrapper->GetLocalCar();
+	if (!car) { return; }
+
+	Vector carVelocity = car.GetVelocity();
+	ball.SetVelocity(carVelocity);
+
+	Vector carLocation = car.GetLocation();
+	float ballRadius = ball.GetRadius();
+	ball.SetLocation(carLocation + Vector{ 0, 0, ballRadius * 2 });
 }
